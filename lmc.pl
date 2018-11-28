@@ -4,7 +4,7 @@ state(Acc, Pc, Mem, In, Out, Flag).
 
 halted_state(Acc, Pc, Mem, In, Out, Flag).
 
-%%sub
+%%sub no flag
 one_instruction(State, NewState):-  State=..L,
                                     nth0(0, L, state),
                                     nth0(3, L, Mem),
