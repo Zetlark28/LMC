@@ -12,4 +12,4 @@ lmc_load(Filename,Mem).
 
 lmc_run(Filename, Input, Output):- lmc_load(Filename, Mem),
 
-                                   exectution_loop(State, Output).
+                                   execution_loop(State, Output).
