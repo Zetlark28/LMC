@@ -64,6 +64,8 @@ one_instruction(State, NewState):-  State=..L,
                                     nth0(5, L, Out),
                                     NewState=.. [state, Ris, Pc_agg, Mem, In, Out, noflag].
                                     
+%%codice per lo store    
+
 %%Sostituisce un elemento dato l'indice
 replace_el([H|T], P, El, [El|T]):- P=0.
 replace_el([H|T], P, El, [H|Z]):-  Pos is P-1, replace_el(T, Pos, El, Z).
