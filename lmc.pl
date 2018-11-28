@@ -85,7 +85,7 @@ sottrazione(N1, N2, Ris):- Diff is N1-N2,
                            Ris is Diff+1000.
 
 sottrazione(N1, N2, Diff):- Diff is N1-N2,
-                            between(-1000, 1000, Diff).
+                            between(-999, 999, Diff).
 
 %%Codice per lo store
 
@@ -111,6 +111,24 @@ one_instruction(State, Newstate):- State=..L,
                                    nth0(6,L,Flag),
                                    Newstate=..[state, Acc, New_Pc, MemAcc, In, Out, Flag].
 
+%%branch
+one_instruction(State, Newstate):- State=..L,
+                                   nth0(0,L,state),
+                                   nth0(3, L, Mem),
+                                   nth0(2, L, Pc),
+                                   nth0(Pc, Mem, Istr),
+                                   between(600, 699, Istr),
+                                   Cell is Istr-600,
+                                   nth0(Cell, Mem, Val),
+                                   pc_branch(Val, New_Pc),
+                                   nth0(4,L,In),
+                                   nth0(5,L,Out),
+                                   nth0(6,L,Flag),
+                                   nth0(1,L,Acc),
+                                   Newstate=..[state, Acc, New_Pc, Mem, In, Out, Flag].
+
+
+
 
 
 execution_loop(State, Out).
@@ -123,4 +141,6 @@ lmc_run(Filename, Input, Output):- lmc_load(Filename, Mem),
 
 
 pc_agg(99,0).
-pc_agg(Pc, New_Pc):- between(0, 100, Pc), New_Pc is Pc+1.
+pc_agg(Pc, New_Pc):- between(0, 99, Pc), New_Pc is Pc+1.
+pc_branch(Pc,0):- Pc>99.
+pc_branch(Pc, New_Pc):- between(0, 99, Pc), New_Pc is Pc.
