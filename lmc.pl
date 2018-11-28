@@ -63,6 +63,28 @@ one_instruction(State, NewState):-  State=..L,
                                     nth0(4, L, In),
                                     nth0(5, L, Out),
                                     NewState=.. [state, Ris, Pc_agg, Mem, In, Out, noflag].
+                                    
+%%Sostituisce un elemento dato l'indice
+replace_el([H|T], P, El, [El|T]):- P=0.
+replace_el([H|T], P, El, [H|Z]):-  Pos is P-1, replace_el(T, Pos, El, Z).
+
+%%store
+one_instruction(State, Newstate):- State=..L,
+                                       nth0(0,L,state),
+                                       nth0(3,L,Mem),
+                                       nth0(2,L,Pc),
+                                       nth0(Pc,Mem,Istr),
+                                       Istr>299,
+                                       Istr<400,
+                                       Cell is Instr-300,
+                                       nth0(1,L,Acc),
+                                       replace_el(Mem,Cell,Acc,MemAcc),
+                                       Pc_new is Pc+1,
+                                       nth0(4,L,In),
+                                       nth0(5,L,Out),
+                                       nth0(6,L,Flag),
+                                       NewState=..[state,Acc,Pc_new,MemAcc,In,Out,Flag].
+
 
 
 execution_loop(State, Out).
@@ -72,26 +94,5 @@ lmc_load(Filename,Mem).
 lmc_run(Filename, Input, Output):- lmc_load(Filename, Mem),
 
                                    execution_loop(State, Output).
-    %%store
-    one_instruction(State, Newstate):- State=..L,
-    nth0(0,L,state),
-    nth0(3,L,Mem),
-    nth0(2,L,Pc),
 
-    nth0(Pc,Mem,Istr),
-    Istr>299,
-    Istr<400,
-    Cell is Instr-300,
-    nth0(1,L,Acc),
-    replace_el(Mem,Cell,Acc,MemAcc),
-    Pc_new is Pc+1,
-    nth0(4,L,In),
-    nth0(5,L,Out),
-    nth0(6,L,Flag),
-    NewState=..[state,Acc,Pc_new,MemAcc,In,Out,Flag].
-    
-    
-    replace_el([H|T],p,el,[H|Z]):- p =0.
-    replace_el([H|Z],p,el,[H|Z]):- Pos is p-1,
-    replace_el(T,Pos,el,Z).
                                  
