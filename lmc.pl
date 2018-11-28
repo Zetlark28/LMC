@@ -4,6 +4,48 @@ state(Acc, Pc, Mem, In, Out, Flag).
 
 halted_state(Acc, Pc, Mem, In, Out, Flag).
 
+%%add no flag
+
+one_instruction(State, X):- State=..L,
+                            nth0(0, L, state),
+                            nth0(2, L, Pc),
+                            nth0(3, L, Mem),
+
+                            nth0(Pc, Mem, Ind),
+                            Ind < 200,
+                            Ind > 99,
+                            Val is Ind-100,
+                            nth0(Val, Mem, Res),
+                            nth0(1, L, Acc),
+                            Fin is Res + Acc,
+                            Fin =< 1000,
+                            Pc_agg is Pc+1,
+                            nth0(4, L, Inp),
+                            nth0(5, L, Out),
+                            X=..[state, Fin, Pc_agg, Mem, Inp, Out, noflag].
+
+%%add flag
+
+one_instruction(State, X):- State=..L,
+                            nth0(0, L, state),
+                            nth0(2, L, Pc),
+                            nth0(3, L, Mem),
+
+                            nth0(Pc, Mem, Ind),
+                            Ind < 200,
+                            Ind > 99,
+                            Val is Ind-100,
+                            nth0(Val, Mem, Res),
+                            nth0(1, L, Acc),
+                            Fin is Res + Acc,
+                            Fin > 1000,
+                            Fin1 is Fin-1000,
+                            Pc_agg is Pc+1,
+                            nth0(4, L, Inp),
+                            nth0(5, L, Out),
+                            X=..[state, Fin1, Pc_agg, Mem, Inp, Out, flag].
+
+
 %%sub no flag
 one_instruction(State, NewState):-  State=..L,
                                     nth0(0, L, state),
