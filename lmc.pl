@@ -170,6 +170,19 @@ one_instruction(State, Newstate):-State=..L,
         
 testa_coda([H|T],H,T).
 
+%%halt
+one_instruction(State, Newstate):-State=..L,
+                                  nth0(0,L,state),
+                                  nth0(3, L, Mem),
+                                  nth0(2, L, Pc),
+                                  nth0(Pc, Mem, Istr),
+                                  Istr<100,
+                                  nth0(1, L, Acc),
+                                  nth0(4, L, In),
+                                  nth0(5, L, Out),
+                                  nth0(6, L, Flag),
+                                  pc_agg(Pc, New_Pc),
+                                  Newstate=..[halted_state, Acc, New_Pc, Mem, In, Out, Flag].
 
 
 execution_loop(State, Out).
