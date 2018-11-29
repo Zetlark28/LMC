@@ -69,19 +69,14 @@ one_instruction(State, NewState):- State=..L,
                                     Cell is Istr-200,
                                     nth0(Cell, Mem, Val),
                                     nth0(1, L, Acc),
-                                    sottrazione(Acc, Val, Ris),
-                                    Ris<0,
+                                    Diff is Acc-Val,
+                                    Diff < 0,
+                                    Ris is Diff+1000,
                                     pc_agg(Pc, New_Pc),
                                     nth0(4, L, In),
                                     nth0(5, L, Out),
                                     NewState=.. [state, Ris, New_Pc, Mem, In, Out, flag].
 
-sottrazione(N1, N2, Ris):- Diff is N1-N2,
-                           Diff<(-1000),
-                           Ris is Diff+1000.
-
-sottrazione(N1, N2, Diff):- Diff is N1-N2,
-                            between(-1000, 1000, Diff).
 
 %%Codice per lo store
 
