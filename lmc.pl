@@ -183,9 +183,16 @@ one_instruction(State, Newstate):-State=..L,
                                   nth0(6, L, Flag),
                                   pc_agg(Pc, New_Pc),
                                   Newstate=..[halted_state, Acc, New_Pc, Mem, In, Out, Flag].
-
-
-execution_loop(State, Out).
+                                 
+                                 
+ execution_loop(State, Out):- one_instruction(State, NewState),
+                             NewState=..L,
+                             nth0(0, L, halted_state),!,
+                             nth0(5, L, Out).
+execution_loop(State,Out):-one_instruction(State, NewState),
+                          NewState=..L,
+                          nth0(0, L, state),
+                          execution_loop(NewState,Out).
 
 lmc_load(Filename,Mem).
 
