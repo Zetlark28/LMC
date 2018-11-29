@@ -153,6 +153,22 @@ one_instruction(State, Newstate):- State=..L,
                                    New_Pc is Pc-600,
                                    Newstate=..[state, Acc, New_Pc, Mem, In, Out, Flag].
                                    
+%%input
+one_instruction(State, Newstate):-State=..L,
+                                  nth0(0,L,state),
+                                  nth0(3, L, Mem),
+                                  nth0(2, L, Pc),
+                                  nth0(Pc, Mem, Istr),
+                                  Istr == 901,
+                                  nth0(4,L,In),
+                                  testa_coda(In, Primo_el, Resto),
+                                  nth0(5,L,Out),
+                                  nth0(6,L,Flag),
+                                  pc_agg(Pc, New_Pc),
+                                  Newstate=..[state, Primo_el, New_Pc, Mem, Resto, Out, Flag].
+                               
+        
+testa_coda([H|T],H,T).
 
 
 
