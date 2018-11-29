@@ -10,7 +10,6 @@ one_instruction(State, X):- State=..L,
                             nth0(0, L, state),
                             nth0(2, L, Pc),
                             nth0(3, L, Mem),
-
                             nth0(Pc, Mem, Ind),
                             Ind < 200,
                             Ind > 99,
@@ -19,10 +18,10 @@ one_instruction(State, X):- State=..L,
                             nth0(1, L, Acc),
                             Fin is Res + Acc,
                             Fin =< 1000,
-                            Pc_agg is Pc+1,
+                            pc_agg(Pc, New_Pc),
                             nth0(4, L, Inp),
                             nth0(5, L, Out),
-                            X=..[state, Fin, Pc_agg, Mem, Inp, Out, noflag].
+                            X=..[state, Fin, New_Pc, Mem, Inp, Out, noflag].
 
 %%add flag
 
@@ -30,7 +29,6 @@ one_instruction(State, X):- State=..L,
                             nth0(0, L, state),
                             nth0(2, L, Pc),
                             nth0(3, L, Mem),
-
                             nth0(Pc, Mem, Ind),
                             Ind < 200,
                             Ind > 99,
@@ -40,13 +38,13 @@ one_instruction(State, X):- State=..L,
                             Fin is Res + Acc,
                             Fin > 1000,
                             Fin1 is Fin-1000,
-                            Pc_agg is Pc+1,
+                            pc_agg(Pc, New_Pc),
                             nth0(4, L, Inp),
                             nth0(5, L, Out),
-                            X=..[state, Fin1, Pc_agg, Mem, Inp, Out, flag].
+                            X=..[state, Fin1, New_Pc, Mem, Inp, Out, flag].
 
 
-%%sub no flag
+%%Sub no flag
 one_instruction(State, NewState):-  State=..L,
                                     nth0(0, L, state),
                                     nth0(3, L, Mem),
@@ -59,10 +57,10 @@ one_instruction(State, NewState):-  State=..L,
                                     nth0(1, L, Acc),
                                     sottrazione(Acc, Val, Ris),
                                     Ris>0,
-                                    Pc_agg is Pc+1,
+                                    pc_agg(Pc, New_Pc),
                                     nth0(4, L, In),
                                     nth0(5, L, Out),
-                                    NewState=.. [state, Ris, Pc_agg, Mem, In, Out, noflag].
+                                    NewState=.. [state, Ris, New_Pc, Mem, In, Out, noflag].
 
 %%sub con flag
 one_instruction(State, NewState):- State=..L,
@@ -77,10 +75,10 @@ one_instruction(State, NewState):- State=..L,
                                     nth0(1, L, Acc),
                                     sottrazione(Acc, Val, Ris),
                                     Ris<0,
-                                    Pc_agg is Pc+1,
+                                    pc_agg(Pc, New_Pc),
                                     nth0(4, L, In),
                                     nth0(5, L, Out),
-                                    NewState=.. [state, Ris, Pc_agg, Mem, In, Out, flag].
+                                    NewState=.. [state, Ris, New_Pc, Mem, In, Out, flag].
 
 sottrazione(N1, N2, Ris):- Diff is N1-N2,
                            Diff<(-1000),
@@ -89,11 +87,7 @@ sottrazione(N1, N2, Ris):- Diff is N1-N2,
 sottrazione(N1, N2, Diff):- Diff is N1-N2,
                             between(-1000, 1000, Diff).
 
-
-                                    
-                                    
-                                    
-%%codice per lo store    
+%%Codice per lo store
 
 %%Sostituisce un elemento dato l'indice
 replace_el([H|T], P, El, [El|T]):- P=0.
@@ -111,12 +105,13 @@ one_instruction(State, Newstate):- State=..L,
                                    Cell is Istr-300,
                                    nth0(1,L,Acc),
                                    replace_el(Mem,Cell,Acc,MemAcc),
-                                   Pc_new is Pc+1,
+                                   pc_agg(Pc, New_Pc),
                                    nth0(4,L,In),
                                    nth0(5,L,Out),
                                    nth0(6,L,Flag),
-                                   Newstate=..[state,Acc,Pc_new,MemAcc,In,Out,Flag].
-                                   
+                                   Newstate=..[state, Acc, New_Pc, MemAcc, In, Out, Flag].
+                                                                
+                    
 %%load
 one_Instruction(State, X):- State=..L,
                             nth0(0, L, state),
@@ -152,9 +147,6 @@ one_Instruction(State, X):- State=..L,
                             X=..[state, Acc, Val, Mem, Inp, Out, noflag].
 
 
-
-
-
 execution_loop(State, Out).
 
 lmc_load(Filename,Mem).
@@ -163,4 +155,6 @@ lmc_run(Filename, Input, Output):- lmc_load(Filename, Mem),
 
                                    execution_loop(State, Output).
 
-                                 
+
+pc_agg(99,0).
+pc_agg(Pc, New_Pc):- between(0, 100, Pc), New_Pc is Pc+1.
