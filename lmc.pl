@@ -42,7 +42,7 @@ one_instruction(State, X):- State=..L,
                             X=..[state, Fin1, New_Pc, Mem, Inp, Out, flag].
 
 
-%%Sub no flag
+%%sub no flag
 one_instruction(State, NewState):-  State=..L,
                                     nth0(0, L, state),
                                     nth0(3, L, Mem),
@@ -117,9 +117,22 @@ one_Instruction(State, X):- State=..L,
                             nth0(5, L, Out),
                             nth0(6, L, F),
                             X=..[state, Res, New_Pc, Mem, Inp, Out, F].
+  
+%%branch if zero 
+one_instruction(State, X):- State=..L,
+                            nth0(0, L, state),
+                            nth0(2, L, Pc),
+                            nth0(3, L, Mem),
+                            nth0(Pc, Mem, Ind),
+                            between(700,799,Ind),
+                            nth0(6, L, noflag),
+                            Val is Ind-700,
+                            nth0(1, L, 0),
+                            nth0(4, L, Inp),
+                            nth0(5, L, Out),
+                            X=..[state, Acc, Val, Mem, Inp, Out, noflag].
                             
  %%branch if positive
- 
  one_instruction(State, X):- State=..L,
                             nth0(0, L, state),
                             nth0(2, L, Pc),
@@ -145,7 +158,7 @@ one_instruction(State, Newstate):- State=..L,
                                    nth0(5,L,Out),
                                    nth0(6,L,Flag),
                                    nth0(1,L,Acc),
-                                   New_Pc is Pc-600,
+                                   New_Pc is Istr-600,
                                    Newstate=..[state, Acc, New_Pc, Mem, In, Out, Flag].
                                    
 %%input
