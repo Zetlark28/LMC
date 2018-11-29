@@ -100,8 +100,8 @@ one_instruction(State, Newstate):- State=..L,
                                    nth0(5,L,Out),
                                    nth0(6,L,Flag),
                                    Newstate=..[state, Acc, New_Pc, MemAcc, In, Out, Flag].
-                                                                
-                    
+
+
 %%load
 one_instruction(State, X):- State=..L,
                             nth0(0, L, state),
@@ -117,8 +117,8 @@ one_instruction(State, X):- State=..L,
                             nth0(5, L, Out),
                             nth0(6, L, F),
                             X=..[state, Res, New_Pc, Mem, Inp, Out, F].
-  
-%%branch if zero 
+
+%%branch if zero
 one_instruction(State, X):- State=..L,
                             nth0(0, L, state),
                             nth0(2, L, Pc),
@@ -131,7 +131,7 @@ one_instruction(State, X):- State=..L,
                             nth0(4, L, Inp),
                             nth0(5, L, Out),
                             X=..[state, 0, Val, Mem, Inp, Out, noflag].
-                            
+
  %%branch if positive
  one_instruction(State, X):- State=..L,
                             nth0(0, L, state),
@@ -160,7 +160,7 @@ one_instruction(State, Newstate):- State=..L,
                                    nth0(1,L,Acc),
                                    New_Pc is Istr-600,
                                    Newstate=..[state, Acc, New_Pc, Mem, In, Out, Flag].
-                                   
+
 %%input
 one_instruction(State, Newstate):-State=..L,
                                   nth0(0,L,state),
@@ -174,8 +174,8 @@ one_instruction(State, Newstate):-State=..L,
                                   nth0(6,L,Flag),
                                   pc_agg(Pc, New_Pc),
                                   Newstate=..[state, Primo_el, New_Pc, Mem, Resto, Out, Flag].
-                               
-        
+
+
 testa_coda([H|T],H,T).
 
 %%halt
@@ -191,9 +191,9 @@ one_instruction(State, Newstate):-State=..L,
                                   nth0(6, L, Flag),
                                   pc_agg(Pc, New_Pc),
                                   Newstate=..[halted_state, Acc, New_Pc, Mem, In, Out, Flag].
-                                  
+
  %%Output
- 
+
  one_instruction(State, X):- State=..L,
                             nth0(0, L, state),
                             nth0(2, L, Pc),
@@ -212,9 +212,9 @@ one_instruction(State, Newstate):-State=..L,
 agg_out([], X, [X]).
 agg_out([H|T], Y, [H|X]):-agg_out(T, Y, X).
 
-                                 
-                                 
- execution_loop(State, Out):- one_instruction(State, NewState),
+
+
+execution_loop(State, Out):- one_instruction(State, NewState),
                              NewState=..L,
                              nth0(0, L, halted_state),!,
                              nth0(5, L, Out).
@@ -224,7 +224,7 @@ execution_loop(State,Out):-one_instruction(State, NewState),
                           execution_loop(NewState,Out).
 
 lmc_load(Filename,Mem).
-lmc_run(Input, Output):- randseq(99, 99, Mem), 
+lmc_run(Input, Output):- randseq(99, 99, Mem),
                          execution_loop(state(0, 0, Mem, Input, [], noflag),Output).
 
 
