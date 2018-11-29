@@ -130,7 +130,7 @@ one_instruction(State, X):- State=..L,
                             nth0(1, L, 0),
                             nth0(4, L, Inp),
                             nth0(5, L, Out),
-                            X=..[state, Acc, Val, Mem, Inp, Out, noflag].
+                            X=..[state, 0, Val, Mem, Inp, Out, noflag].
                             
  %%branch if positive
  one_instruction(State, X):- State=..L,
