@@ -146,6 +146,22 @@ one_Instruction(State, X):- State=..L,
                             nth0(5, L, Out),
                             X=..[state, Acc, Val, Mem, Inp, Out, noflag].
 
+%%branch
+one_instruction(State, Newstate):- State=..L,
+                                   nth0(0,L,state),
+                                   nth0(3, L, Mem),
+                                   nth0(2, L, Pc),
+                                   nth0(Pc, Mem, Istr),
+                                   between(600, 699, Istr),
+                                   nth0(4,L,In),
+                                   nth0(5,L,Out),
+                                   nth0(6,L,Flag),
+                                   nth0(1,L,Acc),
+                                   New_Pc is Pc-600,
+                                   Newstate=..[state, Acc, New_Pc, Mem, In, Out, Flag].
+                                   
+
+
 
 execution_loop(State, Out).
 
