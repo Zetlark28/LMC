@@ -103,7 +103,7 @@ one_instruction(State, Newstate):- State=..L,
                                                                 
                     
 %%load
-one_Instruction(State, X):- State=..L,
+one_instruction(State, X):- State=..L,
                             nth0(0, L, state),
                             nth0(2, L, Pc),
                             nth0(3, L, Mem),
