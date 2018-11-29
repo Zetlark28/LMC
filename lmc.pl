@@ -191,7 +191,7 @@ execution_loop(State,Out):-one_instruction(State, NewState),
 
 lmc_load(Filename,Mem).
 lmc_run(Input, Output):- randseq(99, 99, Mem), 
-                         execution_loop(state(0, 0, Mem, Input, Output),Output).
+                         execution_loop(state(0, 0, Mem, Input, [], noflag),Output).
 
 
 
