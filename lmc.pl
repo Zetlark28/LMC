@@ -116,6 +116,24 @@ one_instruction(State, Newstate):- State=..L,
                                    nth0(5,L,Out),
                                    nth0(6,L,Flag),
                                    Newstate=..[state,Acc,Pc_new,MemAcc,In,Out,Flag].
+                                   
+%%load
+one_Instruction(State, X):- State=..L,
+                            nth0(0, L, state),
+                            nth0(2, L, Pc),
+                            nth0(3, L, Mem),
+
+                            nth0(Pc, Mem, Ind),
+                            Ind < 600,
+                            Ind > 499,
+                            Val is Ind-500,
+                            nth0(Val, Mem, Res),
+                            Pc_agg is Pc+1,
+                            nth0(4, L, Inp),
+                            nth0(5, L, Out),
+                            nth0(6, L, F),
+                            X=..[state, Res, Pc_agg, Mem, Inp, Out, F].
+
 
 
 
