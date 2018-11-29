@@ -133,6 +133,24 @@ one_Instruction(State, X):- State=..L,
                             nth0(5, L, Out),
                             nth0(6, L, F),
                             X=..[state, Res, Pc_agg, Mem, Inp, Out, F].
+                            
+ %%branch if positive
+ 
+ one_instruction(State, X):- State=..L,
+                            nth0(0, L, state),
+                            nth0(2, L, Pc),
+                            nth0(3, L, Mem),
+
+                            nth0(Pc, Mem, Ind),
+                            Ind < 900,
+                            Ind > 799,
+                            nth0(6, L, noflag),
+                            Val is Ind-800,
+                            nth0(1, L, Acc),
+                            nth0(4, L, Inp),
+                            nth0(5, L, Out),
+                            X=..[state, Acc, Val, Mem, Inp, Out, noflag].
+
 
 
 
