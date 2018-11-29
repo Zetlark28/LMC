@@ -166,6 +166,9 @@ one_instruction(State, Newstate):-State=..L,
                                   nth0(6,L,Flag),
                                   pc_agg(Pc, New_Pc),
                                   Newstate=..[state, Primo_el, New_Pc, Mem, Resto, Out, Flag].
+                               
+        
+testa_coda([H|T],H,T).
 
 
 
