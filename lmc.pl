@@ -110,8 +110,8 @@ one_instruction(State, Newstate):- State=..L,
                                    nth0(5,L,Out),
                                    nth0(6,L,Flag),
                                    Newstate=..[state, Acc, New_Pc, MemAcc, In, Out, Flag].
-                                   
- 
+                                                                
+                    
 %%load
 one_Instruction(State, X):- State=..L,
                             nth0(0, L, state),
@@ -145,7 +145,6 @@ one_Instruction(State, X):- State=..L,
                             nth0(4, L, Inp),
                             nth0(5, L, Out),
                             X=..[state, Acc, Val, Mem, Inp, Out, noflag].
-
 
 
 execution_loop(State, Out).
