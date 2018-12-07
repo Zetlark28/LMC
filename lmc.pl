@@ -209,14 +209,8 @@ one_instruction(State, Newstate):-State=..L,
                              nth0(4, L, Inp),
                              nth0(5, L, Out),
                              nth0(6, L, F),
-                             agg_out(Out, Acc, Z),
+                             append(Out, [Acc], z),
                              X=..[state, Acc, New_pc, Mem, Inp, Z, F].
-
-
-agg_out([], X, [X]).
-agg_out([H|T], Y, [H|X]):-agg_out(T, Y, X).
-
-
 
 execution_loop(State, Out):- one_instruction(State, NewState),
                              NewState=..L,
