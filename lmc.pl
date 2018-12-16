@@ -84,7 +84,7 @@ one_instruction(State, NewState):-  State=..L,
                                     nth0(Cell, Mem, Val),
                                     nth0(1, L, Acc),
                                     Ris is Acc-Val,
-                                    Ris>0,
+                                    Ris>=0,
                                     pc_agg(Pc, New_Pc),
                                     nth0(4, L, In),
                                     nth0(5, L, Out),
@@ -96,8 +96,8 @@ one_instruction(State, NewState):- State=..L,
                                     nth0(3, L, Mem),
                                     nth0(2, L, Pc),
                                     nth0(Pc, Mem, Istr),
-                                    between(300,399,Istr),
-                                    Cell is Istr-300,
+                                    between(200,299,Istr),
+                                    Cell is 300-Istr,
                                     nth0(Cell, Mem, Val),
                                     nth0(1, L, Acc),
                                     Diff is Acc-Val,
@@ -256,21 +256,27 @@ execution_loop(State,Out):-State=..L,
                            execution_loop(NewState,Out).
 
 lmc_load(Filename,Mem):- open(Filename, read, Stream),
-                         parser(Stream, Ris),
-                         controllo_mem(Ris,Mem),
+                         read_string(Stream,_, Stringa),
+                         split_string(Stringa,"\r\n","\s\r\n", Stringhe),
+                         length(Stringhe, Lung),
+                         parser(Lung,Stringhe, Ris),
+                         length(Ris, Lung),
+                         controllo_mem(Lung,Ris,Mem),
                          close(Stream),!.
 
 
-controllo_mem(Ris, Mem):- length(Ris, 100),
-                          Mem is Ris .
-controllo_mem(Ris, Y):- append(Ris,[0],T),
-                        controllo_mem(T, Y).
+controllo_mem(100,Ris, Ris):-!.
 
-parser(Stream,Mem):-read_string(Stream,_, Stringa),
-                    split_string(Stringa,"\r\n" ,"\s\r\n", Stringhe),
-                    togli_righe_commenti(Stringhe, Senza_linea_commenti),
-                    elimina_commenti(Senza_linea_commenti, Stringhe_da_analizzare),
-                    analizza_stringa(Stringhe_da_analizzare,Stringhe_da_analizzare, Mem).
+
+controllo_mem(X,Ris, Mem):- append(Ris,[0],Y),
+                            Z is X+1,
+                            controllo_mem(Z,Y, Mem).
+
+parser(1,[""],[0]):-!.
+
+parser(_,Stringhe,Mem):-togli_righe_commenti(Stringhe, Senza_linea_commenti),
+                        elimina_commenti(Senza_linea_commenti, Stringhe_da_analizzare),
+                        analizza_stringa(Stringhe_da_analizzare,Stringhe_da_analizzare, Mem).
 
 togli_righe_commenti([],[]).
 
@@ -360,11 +366,11 @@ trova_valore_et(Stringhe,[_|T], X, Val):- trova_valore_et(Stringhe, T, X, Val).
 
 %%Load
 operazione(Istr, Num, Val):- string_chars(Istr,Car),
-                             nth0(0, Car,'L'),
+                             nth0(0, Car,'L'),!,
                              Val is 500+ Num.
 
 operazione(Istr, Num, Val):- string_chars(Istr, Car),
-                             nth0(0, Car, 'l'),
+                             nth0(0, Car, 'l'),!,
                              Val is 500+Num.
 
 %%Dat
