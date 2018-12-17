@@ -47,7 +47,7 @@ one_instruction(State, X):- State=..L,
                             nth0(Val, Mem, Res),
                             nth0(1, L, Acc),
                             Fin is Res + Acc,
-                            Fin =< 1000,
+                            Fin < 1000,!,
                             pc_agg(Pc, New_Pc),
                             nth0(4, L, Inp),
                             nth0(5, L, Out),
@@ -65,7 +65,7 @@ one_instruction(State, X):- State=..L,
                             nth0(Val, Mem, Res),
                             nth0(1, L, Acc),
                             Fin is Res + Acc,
-                            Fin > 1000,
+                            Fin >=1000,!,
                             Fin1 is Fin-1000,
                             pc_agg(Pc, New_Pc),
                             nth0(4, L, Inp),
@@ -97,7 +97,7 @@ one_instruction(State, NewState):- State=..L,
                                     nth0(2, L, Pc),
                                     nth0(Pc, Mem, Istr),
                                     between(200,299,Istr),
-                                    Cell is 300-Istr,
+                                    Cell is Istr-200,
                                     nth0(Cell, Mem, Val),
                                     nth0(1, L, Acc),
                                     Diff is Acc-Val,
@@ -147,8 +147,8 @@ one_instruction(State, X):- State=..L,
                             nth0(2, L, Pc),
                             nth0(3, L, Mem),
                             nth0(Pc, Mem, Ind),
-                            between(700,799,Ind),!,
-                            nth0(6, L, noflag),
+                            between(700,799,Ind),
+                            nth0(6, L, noflag),!,
                             Val is Ind-700,
                             nth0(4, L, Inp),
                             nth0(5, L, Out),
@@ -257,11 +257,12 @@ execution_loop(State,Out):-State=..L,
 
 lmc_load(Filename,Mem):- open(Filename, read, Stream),
                          read_string(Stream,_, Stringa),
-                         split_string(Stringa,"\r\n","\s\r\n", Stringhe),
+                         split_string(Stringa,"\r\n","\s\t\r\n", Stringhe),
                          length(Stringhe, Lung),
                          parser(Lung,Stringhe, Ris),
-                         length(Ris, Lung),
-                         controllo_mem(Lung,Ris,Mem),
+                         append(Ris,[],Ris2),
+                         length(Ris2, Lung1),
+                         controllo_mem(Lung1,Ris,Mem),
                          close(Stream),!.
 
 
@@ -280,7 +281,7 @@ parser(_,Stringhe,Mem):-togli_righe_commenti(Stringhe, Senza_linea_commenti),
 
 togli_righe_commenti([],[]).
 
-togli_righe_commenti([H|T],Z):- split_string(H,"\s","\s", Stringa),
+togli_righe_commenti([H|T],Z):- split_string(H,"\s\t","\s\t", Stringa),
                                 nth0(0,Stringa,"//"),
                                 togli_righe_commenti(T,Z).
 
@@ -297,7 +298,7 @@ no_commenti([H|_],Y):-H == "//",
                     no_commenti([],Y).
 no_commenti([H|T], [H|Y]):- no_commenti(T,Y).
 
-analizza_stringa(_,[],_).
+analizza_stringa(_,[],[]).
 
 %%una solo istruzione senza etichette o valori
 analizza_stringa(Stringhe,[H|T],[Z|Y]):- length(H,1),!,
