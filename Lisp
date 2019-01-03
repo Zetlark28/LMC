@@ -1,0 +1,48 @@
+(defun one-instruction (state)
+  (cond ((eq (nth 0 state) 'halted-state) (nil))
+        ((= (which-instruction state) 1) (add-max state))
+ (T nil)))
+        
+         
+
+
+
+
+
+
+
+
+
+(defun which-instruction (state)
+  (floor (nth (nth 4 state) (nth 6 state)) 100))
+
+(defun valore (state)
+  (- (nth (nth 4 state) (nth 6 state)) 100))
+
+
+(defun add-max (state)
+	(cond 
+		((> (+ (nth 2 state) (nth (valore state) (nth 6 state))) 1000)
+			((lambda (acc flag pc)
+				(list 'STATE 
+				:acc acc 
+				:pc pc 
+				:mem (nth 6 state)
+				:in (nth 8 state)
+				:out (nth 10 state)
+				:flag flag ))
+				(mod (+ (nth 2 state) (nth (valore state) (nth 6 state))) 1000) 'flag (1+ (nth 4 state))))
+
+                (T (add-min state))))
+
+
+(defun add-min (state)
+  ((lambda (acc flag pc)
+	   (list 'STATE 
+	   :acc acc 
+           :pc pc 
+           :mem (nth 6 state)
+	   :in (nth 8 state)
+	   :out (nth 10 state)
+	   :flag flag ))
+	   (+ (nth 2 state) (nth (valore state) (nth 6 state))) 'noflag (1+ (nth 4 state))))
