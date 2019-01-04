@@ -1,5 +1,6 @@
 (defun one-instruction (state)
-  (cond ((eq (nth 0 state) 'halted-state) (nil))
+  (cond ((null state) nil)
+  	((eq (nth 0 state) 'halted-state) (nil))
         ((= (which-instruction state) 1) (add-max state))
  (T nil)))
         
