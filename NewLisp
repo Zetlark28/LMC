@@ -1,0 +1,54 @@
+(defun one-instruction (state)
+  (cond ((null state) nil)
+  	((eq (nth 0 state) 'halted-state) (nil))
+        ((= (which-instruction state) 1) (add-max state))
+        ((= (which-instruction state) 2) (sub-max state))
+        ((= (which-instruction state) 3) (store state))
+        ((= (which-instruction state) 4) nil)
+        ((= (which-instruction state) 5) (load-instruction state))
+	((= (which-instruction state) 6) (branch state))
+ (T nil)))
+
+
+(defun mem-instruction (state)
+  (mod (nth (nth 4 state) (nth 6 state)) 100))
+
+(defun which-instruction (state)
+  (floor (nth (nth 4 state) (nth 6 state)) 100))
+
+(defun incrementa-pc (state)
+  (cond ((< (nth 4 state) 999) (setf (nth 4 state) (+ 1 (nth 4 state))))
+         (T (setf (nth 4 state) 0))))
+
+(defun add-max (State)
+  (cond ((> (+ (nth 2 state) (nth (mem-instruction state) (nth 6 state))) 1000)
+         ((setf (nth 2 state) (mod (+ (nth 2 state) (nth (mem-instruction state) (nth 6 state))) 1000))
+         (incrementa-pc state)
+         (setf (nth 12 state) 'flag)
+         (setf (nth 8 state) '())
+         (setf (nth 10 state) '())
+         state))
+        
+        (T (add-min state))))
+
+(defun add-min (State)
+  (setf (nth 2 state) (+ (nth 2 state) (nth (mem-instruction state) (nth 6 state))))
+  (incrementa-pc state)
+  (setf (nth 12 state) 'noflag)
+  (setf (nth 8 state) '())
+  (setf (nth 10 state) '())
+  state)
+
+(defun store (State)
+  (setf (nth (mem-instruction state) (nth 6 state)) (nth 2 state))
+  (incrementa-pc state)
+  state)
+
+(defun load-instruction (State)
+  (setf (nth 2 state) (nth (mem-instruction state) (nth 6 state)))
+  (incrementa-pc state)
+  state)
+
+(defun branch (State)
+  (setf (nth 4 state) (nth (mem-instruction state) (nth 6 state)))
+  state)
