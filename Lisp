@@ -3,18 +3,21 @@
   	((eq (nth 0 state) 'halted-state) (nil))
         ((= (which-instruction state) 1) (add-max state))
         ((= (which-instruction state) 2) (sub-inf state))
+        ((= (which-instruction state) 3) (store state))
+        ((= (which-instruction state) 5) (load state))
+        ((= (which-instruction state) 6) (branch state))
+        ((= (which-instruction state) 7) (branch-if-zero state))
+        ((= (which-instruction state) 8) (branch-if-pos state))
+        ((= (which-instruction state) 0) (halt state))
+        ((= (nth (nth 4 state) (nth 6 state) 901) (input state))
+        ((= (nth (nth 4 state) (nth 6 state) 902) (output state))
+
  (T nil)))
-        
-         
-
-
-
-
-
-
-
-
-
+    
+(defun incrementa-pc (state)
+  (cond ((<(nth 4 state) 999) (+ (nth 4 state) 1 ))
+  (T 0)))
+                     
 (defun which-instruction (state)
   (floor (nth (nth 4 state) (nth 6 state)) 100))
 
@@ -23,9 +26,8 @@
 
 
 (defun add-max (state)
-	(cond 
-		((> (+ (nth 2 state) (nth (mem-instruction state) (nth 6 state))) 1000)
-			((lambda (acc flag pc)
+	(cond 	((> (+ (nth 2 state) (nth (mem-instruction state) (nth 6 state))) 1000)
+ 		((lambda (acc flag pc)
 				(list 'STATE 
 				:acc acc 
 				:pc pc 
@@ -33,7 +35,7 @@
 				:in (nth 8 state)
 				:out (nth 10 state)
 				:flag flag ))
-				(mod (+ (nth 2 state) (nth (mem-instruction state) (nth 6 state))) 1000) 'flag (1+ (nth 4 state))))
+				(mod (+ (nth 2 state) (nth (mem-instruction state) (nth 6 state))) 1000) 'flag (incrementa-pc state))
 
                 (T (add-min state))))
 
@@ -47,7 +49,7 @@
 	   :in (nth 8 state)
 	   :out (nth 10 state)
 	   :flag flag ))
-	   (+ (nth 2 state) (nth (mem-instruction state) (nth 6 state))) 'noflag (1+ (nth 4 state))))
+	   (+ (nth 2 state) (nth (mem-instruction state) (nth 6 state))) 'noflag (incrementa-pc state)))
 
 
 (defun sub-inf (state)
@@ -60,7 +62,7 @@
             :in (nth 8 state)
             :out (nth 10 state)
             :flag flag ))
-            (+ (- (nth (mem-instruction state) (nth 6 state)) (nth 2 state)) 1000) 'flag (1+ (nth 4 state))))
+            (+ (- (nth (mem-instruction state) (nth 6 state)) (nth 2 state)) 1000) 'flag (incrementa-state)))
 
      (T (sub-sup state))))
 
@@ -73,4 +75,4 @@
             :in (nth 8 state)
             :out (nth 10 state)
             :flag flag ))
-            (- (nth (mem-instruction state) (nth 6 state)) (nth 2 state) 'noflag (1+ (nth 4 state))))
+            (- (nth (mem-instruction state) (nth 6 state)) (nth 2 state) 'noflag (incrementa-pc state)))
