@@ -24,6 +24,10 @@
   (cond ((< (nth 4 state) 999) (setf (nth 4 state) (1+ (nth 4 state))))
          (T (setf (nth 4 state) 0))))
 
+(defun halt (state)
+       (setf (nth 0 state) 'halted-state))
+
+
 (defun sub-max (state)
  (cond ((< (- (nth (mem-instruction state) (nth 6 state)) (nth 2 state)) 0)
        ((setf (nth 2 state) (+ (- (nth (mem-instruction state) (nth 6 state)) (nth 2 state)) 1000))
@@ -59,6 +63,14 @@
 
 (defun branch (State)
   (setf (nth 4 state) (nth (mem-instruction state) (nth 6 state))))
+
+(defun branch-if-zero (state)
+  (cond (= (nth 2 state) 0 ) (= (nth 12 state) 'noflag)) (setf (nth 4 state) (nth (mem-instruction state) (nth 6 state)))
+        (incrementa-pc state)))
+
+(defun branch-if-positive (state) 
+  (cond (= (nth 12 state) 'noflag) (setf (nth 4 state) (nth (mem-instruction state) (nth 6 state)))
+        (incrmenta-pc state)))
 
 (defun lmc-run (Filename Input) 
   (execution-loop(list state :acc 0 :pc 0 :mem (lmc-load Filename) :in Input :out () :flag 'noflag)))
