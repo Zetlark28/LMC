@@ -4,9 +4,13 @@
         ((= (which-instruction state) 1) (add-max state))
         ((= (which-instruction state) 2) (sub-max state))
         ((= (which-instruction state) 3) (store state))
-        ((= (which-instruction state) 4) nil)
         ((= (which-instruction state) 5) (load-instruction state))
 	((= (which-instruction state) 6) (branch state))
+        ((= (which-instruction state) 7) (branch-if-zero state))
+        ((= (which-instruction state) 8) (branch-if-pos state))
+        ((= (nth (nth 4 state) (nth 6 state)) 901) (input state))
+        ((= (nth (nth 4 state) (nth 6 state)) 902) (output state))
+        ((= (which-instruction state) 0) (halt state))
  (T nil)))
 
 
@@ -20,20 +24,17 @@
   (cond ((< (nth 4 state) 999) (setf (nth 4 state) (1+ (nth 4 state))))
          (T (setf (nth 4 state) 0))))
 
-(defun sub-max (State)
+(defun sub-max (state)
  (cond ((< (- (nth (mem-instruction state) (nth 6 state)) (nth 2 state)) 0)
-       ((setf (nth 2 state) (+ (- (nth (mem-instruction state) (nth 6 state)) (nth 2 state)) 1000)
+       ((setf (nth 2 state) (+ (- (nth (mem-instruction state) (nth 6 state)) (nth 2 state)) 1000))
        (incrementa-pc state)
-       (setf (nth 12 state) 'flag)
-        state))
- 
-       (T (add-min state))))
+       (setf (nth 12 state) 'flag))
+       (T (add-min state)))) 
 
 (defun sub-min (State)
-  (setf (nth 2 state) (- (nth (mem-instruction state) (nth 6 state)) (nth 2 state))
+  ((setf (nth 2 state) (- (nth (mem-instruction state) (nth 6 state)) (nth 2 state))
   (incrementa-pc state)
-  (setf (nth 12 state) 'noflag)
-   state)
+  (setf (nth 12 state) 'noflag)))
         
 (defun add-max (State)
   (cond ((> (+ (nth 2 state) (nth (mem-instruction state) (nth 6 state))) 1000)
@@ -41,7 +42,6 @@
          (incrementa-pc state)
          (setf (nth 12 state) 'flag)
          state))
-       
         (T (add-min state))))
 
 (defun add-min (State)
@@ -63,3 +63,6 @@
 (defun branch (State)
   (setf (nth 4 state) (nth (mem-instruction state) (nth 6 state)))
   state)
+
+(defun lmc-run (Filename Input) 
+  (execution-loop(list state :acc 0 :pc 0 :mem (lmc-load Filename) :in Input :out () :flag 'noflag)))
