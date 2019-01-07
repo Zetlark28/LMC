@@ -75,4 +75,73 @@
             :in (nth 8 state)
             :out (nth 10 state)
             :flag flag ))
-            (- (nth (mem-instruction state) (nth 6 state)) (nth 2 state) 'noflag (incrementa-pc state)))
+            (- (nth (mem-instruction state) (nth 6 state)) (nth 2 state)) 'noflag (incrementa-pc state)))
+
+(defun branch (state)
+  (list 'STATE
+  :acc (nth 0 state)
+  :pc  (nth (mem-instruction state) (nth 6 state))
+  :mem (nth 6 state)
+  :in (nth 8 state)
+  :out (nth 10 state)
+  :flag flag))
+
+(defun branch-if-pos (state)
+ (cond (((= (nth 2 state) 0 ) (= (nth 12 state) noflag))
+    (list 'STATE 
+    :acc (nth 2 state)
+    :pc (nth (mem-instruction state) (nth 6 state))
+    :mem (nth 6 state)
+    :in (nth 8 state)
+    :out (nth 10 state)
+    :flag (nth 12 state))) 
+ ((lambda (pc)
+  (list 'STATE 
+  :acc (nth 0 state)
+  :pc pc
+  :mem (nth 6 state)
+  :in (nth 8 state)
+  :out (nth 10 state)
+  :flag (nth 12 state))) 
+  (incrementa-pc state))))
+
+(defun branch-if-zero (state)
+ (cond (((= (nth 2 state) 0 ) (= (nth 12 state) noflag))
+       (list 'STATE  
+       :acc (nth 2 state)
+       :pc (nth (mem-instruction state) (nth 6 state))
+       :mem (nth 6 state)
+       :in (nth 8 state)
+       :out (nth 10 state)
+       :flag (nth 12 state)))
+ ((lambda (pc)
+  (list 'STATE 
+  :acc (nth 0 state9
+  :pc pc 
+  :mem (nth 6 state)
+  :in (nth 8 state)
+  :out (nth 10 state)
+  :flag (nth 12 state)))
+  (incrementaa-pc state))
+
+(defun halt (state) 
+ (( lambda (pc) 
+   (list 'HALTED-STATE
+   :acc (nth 2 state)
+   :pc pc 
+   :mem (nth 6 state)
+   :in (nth 8 state)
+   :out (nth 10 state)
+   :flag (nth 12 state))) 
+  (incrementa-pc state)))
+
+(defun store (state) 
+ ((lambda (pc)
+      (list 'STATE
+      :acc (nth 2 state)
+      :pc pc
+      :mem (replace mem acc :start1 (- pc 2) :end1 (- pc 2)  ) 
+      :in (nth 8 state)
+      :out (nth 10 state)
+      :flag (nth 12 state)))
+      (incrementa-pc state)))
