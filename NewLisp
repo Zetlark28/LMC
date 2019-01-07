@@ -68,7 +68,7 @@
   (cond (= (nth 2 state) 0 ) (= (nth 12 state) 'noflag)) (setf (nth 4 state) (nth (mem-instruction state) (nth 6 state)))
         (incrementa-pc state)))
 
-(defun branch-if-positive (state) 
+(defun branch-if-pos (state) 
   (cond (= (nth 12 state) 'noflag) (setf (nth 4 state) (nth (mem-instruction state) (nth 6 state)))
         (incrmenta-pc state)))
 
