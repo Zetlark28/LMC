@@ -4,7 +4,7 @@
         ((= (which-instruction state) 1) (add-max state))
         ((= (which-instruction state) 2) (sub-inf state))
         ((= (which-instruction state) 3) (store state))
-        ((= (which-instruction state) 5) (load state))
+        ((= (which-instruction state) 5) (load1 state))
         ((= (which-instruction state) 6) (branch state))
         ((= (which-instruction state) 7) (branch-if-zero state))
         ((= (which-instruction state) 8) (branch-if-pos state))
@@ -64,7 +64,7 @@
 
 (defun branch (state)
   (list 'STATE
-  :acc (nth 0 state)
+  :acc (nth 2 state)
   :pc  (nth (mem-instruction state) (nth 6 state))
   :mem (nth 6 state)
   :in (nth 8 state)
@@ -72,29 +72,24 @@
   :flag (nth 12 state)))
 
 (defun branch-if-pos (state)
- (cond ((= (nth 2 state) 0) (cond (= (nth 12 state) 'noflag)
-                              (branch state)))
- ((lambda (pc)
-     (list 'STATE 
-     :acc (nth 0 state)
-     :pc pc
+ (cond ((and (>= (nth 2 state) 0) (eq (nth 12 state) 'noflag))(branch state))
+     (T(list 'STATE 
+     :acc (nth 2 state)
+     :pc (incrementa-pc state)
      :mem (nth 6 state)
      :in (nth 8 state)
      :out (nth 10 state)
-     :flag (nth 12 state))) 
-     (incrementa-pc state))))
+     :flag (nth 12 state)))))
 
 (defun branch-if-zero (state)
  (cond ((= (nth 2 state) 0) (branch state))
- ((lambda (pc)
-  (list 'STATE 
-  :acc (nth 0 state)
-  :pc pc 
+  (T(list 'STATE 
+  :acc (nth 2 state)
+  :pc (incrementa-pc state)
   :mem (nth 6 state)
   :in (nth 8 state)
   :out (nth 10 state)
-  :flag (nth 12 state)))
-  (incrementa-pc state))))
+  :flag (nth 12 state)))))
 
 (defun halt (state) 
  (( lambda (pc) 
@@ -122,6 +117,14 @@
  (cond ((= Pos 0) Element))
        (append (replace1 Element (cdr Mem) (cdr Mem) (- Pos 1))))
  
+(defun load1 (state)
+    (list 'STATE 
+    :acc (nth (mem-instruction state) (nth 6 state))
+    :pc (incrementa-pc state)
+    :mem (nth 6 state)
+    :in (nth 8 state)
+    :out (nth 10 state)
+    :flag (nth 12 state)))
 
 (defun input (state)
  (list 'STATE
@@ -155,4 +158,4 @@
                     :flag 'noflag)))
 
 (defun lmc-load (Filename) )
--
+
