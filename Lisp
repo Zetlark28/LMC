@@ -14,8 +14,8 @@
 
  (T nil)))
     
-(defun incrementa-pc (state)
-  (cond ((<(nth 4 state) 999) (+ (nth 4 state) 1 ))
+(defun incrementa-pc (pc)
+  (cond ((< pc 99) (+ pc 1 ))
   (T 0)))
                      
 (defun which-instruction (state)
@@ -29,7 +29,7 @@
 	(cond 	((> (+ (nth 2 state) (nth (mem-instruction state) (nth 6 state))) 1000)
 				(list 'STATE 
 				:acc (mod (+ (nth 2 state) (nth (mem-instruction state) (nth 6 state))) 1000)
-				:pc (incrementa-pc state)
+				:pc (incrementa-pc (nth 4 state))
 				:mem (nth 6 state)
 				:in (nth 8 state)
 				:out (nth 10 state)
@@ -37,7 +37,7 @@
 
                       (T (list 'STATE 
 	                 :acc (+ (nth 2 state) (nth (mem-instruction state) (nth 6 state)))
-                         :pc (incrementa-pc state)
+                         :pc (incrementa-pc (nth 4 state))
                          :mem (nth 6 state)
 	                 :in (nth 8 state)
 	                 :out (nth 10 state)
@@ -48,7 +48,7 @@
          (cond ((< (- (nth (mem-instruction state) (nth 6 state)) (nth 2 state)) 0)
                (list 'STATE 
                :acc (+ (- (nth (mem-instruction state) (nth 6 state)) (nth 2 state)) 1000)
-               :pc (incrementa-pc state)
+               :pc (incrementa-pc (nth 4 state))
                :mem (nth 6 state)
                :in (nth 8 state)
                :out (nth 10 state)
@@ -56,7 +56,7 @@
 
          (T (list 'STATE 
             :acc (- (nth (mem-instruction state) (nth 6 state)) (nth 2 state))
-            :pc (incrementa-pc state) 
+            :pc (incrementa-pc (nth 4 state)) 
             :mem (nth 6 state)
             :in (nth 8 state)
             :out (nth 10 state)
@@ -75,7 +75,7 @@
  (cond ((and (>= (nth 2 state) 0) (eq (nth 12 state) 'noflag))(branch state))
      (T(list 'STATE 
      :acc (nth 2 state)
-     :pc (incrementa-pc state)
+     :pc (incrementa-pc (nth 4 state))
      :mem (nth 6 state)
      :in (nth 8 state)
      :out (nth 10 state)
@@ -85,7 +85,7 @@
  (cond ((= (nth 2 state) 0) (branch state))
   (T(list 'STATE 
   :acc (nth 2 state)
-  :pc (incrementa-pc state)
+  :pc (incrementa-pc (nth 4 state))
   :mem (nth 6 state)
   :in (nth 8 state)
   :out (nth 10 state)
@@ -94,31 +94,29 @@
 (defun halt (state) 
    (list 'HALTED-STATE
    :acc (nth 2 state)
-   :pc (incrementa-pc state) 
+   :pc (incrementa-pc (nth 4 state)) 
    :mem (nth 6 state)
    :in (nth 8 state)
    :out (nth 10 state)
    :flag (nth 12 state)))
 
 (defun store (state) 
- ((lambda (pc)
-      (list 'STATE
-      :acc (nth 2 state)
-      :pc pc
-      :mem (replace1 (nth 2 state) (nth 6 state) (mem-instruction state))
-      :in (nth 8 state)
-      :out (nth 10 state)
-      :flag (nth 12 state)))
-      (incrementa-pc state)))
+   (list 'STATE
+   :acc (nth 2 state)
+   :pc (incrementa-pc (nth 4 state))
+   :mem (replace1 state)
+   :in (nth 8 state)
+   :out (nth 10 state)
+   :flag (nth 12 state)))
 
-(defun replace1 (Element Mem Pos)
- (cond ((= Pos 0) Element))
-       (append (replace1 Element (cdr Mem) (cdr Mem) (- Pos 1))))
+(defun replace1 (state)
+  (setf (nth (mem-instruction state) (nth 6 state)) (nth 2 state))
+  (nth 6 state))
  
 (defun load1 (state)
     (list 'STATE 
     :acc (nth (mem-instruction state) (nth 6 state))
-    :pc (incrementa-pc state)
+    :pc (incrementa-pc (nth 4 state))
     :mem (nth 6 state)
     :in (nth 8 state)
     :out (nth 10 state)
@@ -127,7 +125,7 @@
 (defun input (state)
  (list 'STATE
  :acc (car (nth 8 state))
- :pc (incrementa-pc state)
+ :pc (incrementa-pc (nth 4 state))
  :mem (nth 6 state)
  :in  (cdr (nth 8 state))
  :out (nth 10 state)
@@ -136,7 +134,7 @@
 (defun output (state)
   (list 'STATE 
   :acc (nth 2 state)
-  :pc (incrementa-pc state)
+  :pc (incrementa-pc (nth 4 state))
   :mem (nth 6 state)
   :in (nth 8 state)
   :out (append (nth 10 state) (list (nth 2 state)))
@@ -144,7 +142,8 @@
 
 (defun execution-loop (state) 
  (cond ((= (nth 0 state) 'halted-state) (nth 10 state))
-       (T (one-instruction state))))
+       ((null state) nil)
+       (T (execution-loop(one-instruction state)))))
 
 (defun lmc-run (Filename Inp) 
     (execution-loop (list 'STATE
@@ -156,4 +155,3 @@
                     :flag 'noflag)))
 
 (defun lmc-load (Filename) )
-
