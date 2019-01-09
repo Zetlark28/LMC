@@ -154,4 +154,14 @@
                     :out ()
                     :flag 'noflag)))
 
-(defun lmc-load (Filename) )
+(defun lmc-load (Filename) 
+(with-open-file (in Filename :direction :input :if-does-not-exist :error)
+(parser in)))
+
+(defun parser (stream) 
+ (read-list-from stream))
+
+(defun read-list-from (input-stream)
+(let ((e (read input-stream nil ’eof)))
+(unless (eq e ’eof)
+(cons e (read-list-from input-stream)))))
