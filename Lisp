@@ -141,7 +141,7 @@
   :flag (nth 12 state)))
 
 (defun execution-loop (state) 
- (cond ((= (nth 0 state) 'halted-state) (nth 10 state))
+ (cond ((eq (nth 0 state) 'halted-state) (nth 10 state))
        ((null state) nil)
        (T (execution-loop(one-instruction state)))))
 
