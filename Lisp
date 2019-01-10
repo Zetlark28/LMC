@@ -1,3 +1,5 @@
+;;Clark Ezpeleta 837002  Sad Rafik 816920  Alessio Cottarelli ...
+
 (defun one-instruction (state)
   (cond ((null state) nil)
   	((eq (nth 0 state) 'halted-state) nil)
