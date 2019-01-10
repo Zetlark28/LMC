@@ -1,7 +1,7 @@
 Al progetto ha partecipato:
--Clark Ezpeleta               837002 
+-Ezpeleta Clark               837002 
 -Sad Rafik                    816920
--Alessio Cottarelli           829659
+-Cottarelli Alessio           829659
 
 Il programma è un simulatore di un computer ad istruzioni.
 Il programma viene avviato dando in input un file assembly che verrà decodificato in codice macchina,
