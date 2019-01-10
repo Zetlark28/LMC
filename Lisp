@@ -1,4 +1,4 @@
-;;Clark Ezpeleta 837002  Sad Rafik 816920  Alessio Cottarelli 829659
+;;Ezpeleta Clark 837002,  Sad Rafik 816920 , Cottarelli Alessio 829659
 
 (defun one-instruction (state)
   (cond ((null state) nil)
