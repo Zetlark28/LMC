@@ -1,4 +1,4 @@
-;;Clark Ezpeleta 837002  Sad Rafik 816920  Alessio Cottarelli ...
+;;Clark Ezpeleta 837002  Sad Rafik 816920  Alessio Cottarelli 829659
 
 (defun one-instruction (state)
   (cond ((null state) nil)
@@ -164,6 +164,6 @@
  (read-list-from stream))
 
 (defun read-list-from (input-stream)
-(let ((e (read input-stream nil ’eof)))
-(unless (eq e ’eof)
+(let ((e (read input-stream nil â€™eof)))
+(unless (eq e â€™eof)
 (cons e (read-list-from input-stream)))))
