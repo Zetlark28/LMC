@@ -203,7 +203,7 @@
              (read-from-string (car mem)))
          (cons (string-trim '(#\Space #\Tab #\Newline)
                             (subseq (car mem) (search " " (car mem))))
-               (elimina-etichette (car mem) etichetta)))
+               (elimina-etichette (cdr mem) etichetta)))
         (T (cons (car mem) (elimina-etichette (cdr mem) etichetta)))))
 
 (defun etichetta-scelta (string etichetta)
@@ -221,7 +221,7 @@
 
 (defun instruction (memoria etichetta)
   (cond ((null memoria) nil)
-         ((eq (read-from-string (car memoria)) 'ADD)
+         ((eq (read-from-string (car  memoria)) 'ADD)
           (cons (+ 100 (etichetta-scelta (string-trim '(#\Space #\Newline #\Tab)
                         (subseq (car memoria) (search " " (car memoria)))) etichetta))
            (instruction (cdr memoria) etichetta)))
@@ -263,11 +263,11 @@
            ((eq (read-from-string (car memoria)) 'OUT)
      (cons 902 (instruction (cdr memoria) etichetta)))
 
-            ((eq (read-from-string (first memoria)) 'HLT)
+            ((eq (read-from-string (car memoria)) 'HLT)
      (cons 000 (instruction (cdr memoria) etichetta)))
 
             ((eq (read-from-string (car memoria)) 'DAT)
-     (if (eq (string-trim '(#\Space #\Newline #\Tab) (first memoria)) "dat")
+     (if (eq (string-trim '(#\Space #\Newline #\Tab) (car memoria)) "dat")
        (cons 000 (instruction (cdr memoria) etichetta))
        (cons (parse-integer (string-trim '(#\Space #\Newline #\Tab)
                           (subseq (car memoria) (search " " (car memoria)))))
