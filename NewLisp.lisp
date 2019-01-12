@@ -1,5 +1,3 @@
-;;Ezpeleta Clark 837002,  Sad Rafik 816920 , Cottarelli Alessio 829659
-
 (defun one-instruction (state)
   (cond ((null state) nil)
   	((eq (nth 0 state) 'halted-state) nil)
@@ -196,8 +194,8 @@
          ((eq (find (read-from-string (car lista))
                     '(ADD SUB STA LDA BRA BRZ BRP INP OUT HLT DAT)
                     :test #'equal) NIL)
-          (cons (read-from-string (car lista)) (etichette (cdr lista)))))
-        (T (cons 0 (etichette (cdr lista)))))
+          (cons (read-from-string (car lista)) (etichette (cdr lista))))
+        (T (cons 0 (etichette (cdr lista))))))
 
 (defun elimina-etichette (mem etichetta)
   (cond ((null mem) nil)
