@@ -28,7 +28,7 @@
 (defun add-max (state)
 	(cond 	((> (+ (nth 2 state) (nth (mem-instruction state) (nth 6 state))) 1000)
 				(list 'STATE 
-				:acc (mod (+ (nth 2 state) (nth (mem-instruction state) (nth 6 state))) 1000)
+	         		:acc (mod (+ (nth 2 state) (nth (mem-instruction state) (nth 6 state))) 1000)
 				:pc (incrementa-pc (nth 4 state))
 				:mem (nth 6 state)
 				:in (nth 8 state)
@@ -207,17 +207,12 @@
         (T (cons (car mem) (elimina-etichette (cdr mem) etichetta)))))
 
 (defun etichetta-scelta (string etichetta)
-  (its-number (read-from-string string)) 
-    (if (eq (find (read-from-string string) etichetta :test #'equal) NIL)
-      (position (read-from-string string) etichetta)))
-
-
-(defun its-number (string)
-  (if (numberp string) (parse-integer string)))
+    (if (numberp (read-from-string string)) (parse-integer string) 
+    (if (eql (find (read-from-string string) etichetta :test #'equal) 'nil) (progn)
+      (position (read-from-string string) etichetta))))
 
 (defun riempi-memoria (memoria)
-  (cond ((null memoria) (make-list 100 :initial-element 0))
-        (T (append memoria (make-list (- 100 (length memoria)) :initial-element 0)))))
+     (append memoria (make-list (- 100 (length memoria)) :initial-element 0)))
 
 (defun instruction (memoria etichetta)
   (cond ((null memoria) nil)
