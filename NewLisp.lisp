@@ -148,7 +148,7 @@
        (T (execution-loop(one-instruction state)))))
 
 (defun lmc-load (filename)
-  (let ((newmem (crea-lista (open-file filename))))
+  (let ((newmem (nuova-lista (open-file filename))))
     (let ((labelist (etichette newmem)))
       (riempi-memoria
        (instruction 
