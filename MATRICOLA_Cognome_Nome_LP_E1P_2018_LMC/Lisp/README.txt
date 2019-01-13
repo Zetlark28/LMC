@@ -18,9 +18,15 @@ mem-instruction= serve ad identificare il valore all'interno dell'istruzione
 
 replace1 =serve a cambiare un elemento di una lista
 
+
+
 Metodi utilizzati nel parser:
 
 open-file: serve per aprire il file
 
 crea-lista: legge il file, e ne crea una lista
+
+nuova-lista: prende come argomento la lista creata, con il metodo "maiuscolo" traforma tutte le stringhe in maiuscolo. Il metodo                        "maiuscolo" inoltre elimina le righe identificate da "//" come commenti e che non andranno lette. Infine è presente un ultimo              metodo chiamato "elimina-riga-vuota" che serve per l'appunto ad eliminare le righe che non contengono stringhe.
+
+etichette: 
 
