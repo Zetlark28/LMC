@@ -28,5 +28,9 @@ crea-lista: legge il file, e ne crea una lista
 
 nuova-lista: prende come argomento la lista creata, con il metodo "maiuscolo" traforma tutte le stringhe in maiuscolo. Il metodo                        "maiuscolo" inoltre elimina le righe identificate da "//" come commenti e che non andranno lette. Infine è presente un ultimo              metodo chiamato "elimina-riga-vuota" che serve per l'appunto ad eliminare le righe che non contengono stringhe.
 
-etichette: 
+etichette: riconosce le keywords del file
+
+riempi-memoria: riempe la memoria con degli zeri se essa è composta da meno di 100 elementi
+
+istruzione: fa corrispondere ad ogni etichetta, la relativa istruzione
 
