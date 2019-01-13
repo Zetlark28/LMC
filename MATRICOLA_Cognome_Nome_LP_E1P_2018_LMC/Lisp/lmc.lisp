@@ -1,3 +1,5 @@
+;;Ezpeleta Clark 837002,  Sad Rafik 816920 , Cottarelli Alessio 829659
+
 (defun one-instruction (state)
   (cond ((null state) nil)
   	((eq (nth 0 state) 'halted-state) nil)
