@@ -1,8 +1,8 @@
 (defun one-instruction (state)
   (cond ((null state) nil)
   	((eq (nth 0 state) 'halted-state) nil)
-        ((= (which-instruction state) 1) (add-max state))
-        ((= (which-instruction state) 2) (sub-inf state))
+        ((= (which-instruction state) 1) (add state))
+        ((= (which-instruction state) 2) (sub state))
         ((= (which-instruction state) 3) (store state))
         ((= (which-instruction state) 5) (load1 state))
         ((= (which-instruction state) 6) (branch state))
@@ -25,7 +25,7 @@
   (mod (nth (nth 4 state) (nth 6 state)) 100))
 
 
-(defun add-max (state)
+(defun add (state)
 	(cond 	((> (+ (nth 2 state) (nth (mem-instruction state) (nth 6 state))) 1000)
 				(list 'STATE 
 	         		:acc (mod (+ (nth 2 state) (nth (mem-instruction state) (nth 6 state))) 1000)
@@ -44,7 +44,7 @@
 	                 :flag 'noflag))))
 
 
-(defun sub-inf (state)
+(defun sub (state)
          (cond ((< (- (nth (mem-instruction state) (nth 6 state)) (nth 2 state)) 0)
                (list 'STATE 
                :acc (+ (- (nth (mem-instruction state) (nth 6 state)) (nth 2 state)) 1000)
@@ -65,7 +65,7 @@
 (defun branch (state)
   (list 'STATE
   :acc (nth 2 state)
-  :pc  (nth (mem-instruction state) (nth 6 state))
+  :pc  (mem-instruction state)
   :mem (nth 6 state)
   :in (nth 8 state)
   :out (nth 10 state)
@@ -145,43 +145,42 @@
        ((null state) nil)
        (T (execution-loop(one-instruction state)))))
 
-(defun lmc-load (filename)
-  (let ((newmem (nuova-lista (open-file filename))))
-    (let ((labelist (etichette newmem)))
-      (riempi-memoria
-       (instruction 
-        (elimina-etichette newmem labelist) labelist)))))
+
 
 (defun lmc-run (Filename In) 
     (execution-loop (list 'STATE
-                    :acc '0
-                    :pc  '0
+                    :acc 0
+                    :pc  0
                     :mem (lmc-load Filename)
                     :in In
                     :out ()
                     :flag 'noflag)))
 
-(defun open-file (Filename) 
-(with-open-file (in Filename :direction :input :if-does-not-exist :error)
-(crea-lista in)))
+(defun lmc-load (Filename)
+  (let ((nuovamemoria (nuova-lista (lmc-open Filename))))
+    (let ((listaetichette (etichette nuovamemoria)))
+      (riempi-memoria 
+       (istruzione 
+        (elimina-etichette nuovamemoria listaetichette) listaetichette)))))
 
-(defun crea-lista (input-stream) 
- (let ((e (read-line input-stream nil 'eof)))
-   (unless (eq e 'eof)
-     (append (list e) (crea-lista input-stream)))))
+(defun lmc-open (file)
+  (with-open-file (in file
+                        :direction :input
+                        :if-does-not-exist :error)
+    (crea-lista in)))
 
+(defun crea-lista (input-stream)
+  (let ((e (read-line input-stream nil 'eof)))
+    (unless (eq e 'eof)
+      (append (list e) (crea-lista input-stream)))))
 
-(defun lower (line)
-  (string-downcase (string-trim '(#\Space #\Tab #\Newline)
-                                (elimina-commenti line))))
+(defun upper (line)
+  (string-upcase
+   (string-trim '(#\Space #\Newline #\Tab)
+                (elimina-commenti line))))
 
 (defun elimina-commenti (line)
   (subseq line 0 (search "//" line)))
-
-(defun nuova-lista (vecchialista)
-  (let ((nuovalista (mapcar 'lower vecchialista)))
-    (elimina-riga-vuota nuovalista)))
-
 
 (defun elimina-riga-vuota (lista)
   (cond ((null lista) nil)
@@ -189,83 +188,92 @@
          (elimina-riga-vuota (cdr lista)))
         (T (cons (car lista) (elimina-riga-vuota (cdr lista))))))
 
+(defun nuova-lista (vecchialista)
+  (let ((nuovalista (mapcar 'upper vecchialista)))
+    (elimina-riga-vuota nuovalista)))
+
 (defun etichette (lista)
   (cond ((null lista) nil)
-         ((eq (find (read-from-string (car lista))
+        ((eql (find (read-from-string(car lista))
                     '(ADD SUB STA LDA BRA BRZ BRP INP OUT HLT DAT)
                     :test #'equal) NIL)
-          (cons (read-from-string (car lista)) (etichette (cdr lista))))
+         (cons (read-from-string (car lista)) (etichette (cdr lista))))
         (T (cons 0 (etichette (cdr lista))))))
 
-(defun elimina-etichette (mem etichetta)
-  (cond ((null mem) nil)
-        ((eq (find (read-from-string (car mem)) etichetta)
-             (read-from-string (car mem)))
-         (cons (string-trim '(#\Space #\Tab #\Newline)
-                            (subseq (car mem) (search " " (car mem))))
-               (elimina-etichette (cdr mem) etichetta)))
-        (T (cons (car mem) (elimina-etichette (cdr mem) etichetta)))))
+(defun elimina-etichette (memoria etichetta)
+  (cond ((null memoria) nil)
+        ((equal (find (read-from-string (car memoria)) etichetta)
+              (read-from-string (car memoria)))
+         (cons (string-trim '(#\Space #\Newline #\Tab)
+                           (subseq (car memoria) (search " " (car memoria))))
+               (elimina-etichette (cdr memoria) etichetta)))
+        (T (cons (car memoria) (elimina-etichette (cdr memoria) etichetta)))))
+
 
 (defun etichetta-scelta (string etichetta)
-    (if (numberp (read-from-string string)) (parse-integer string) 
-    (if (eql (find (read-from-string string) etichetta :test #'equal) 'nil) (progn)
+  (if (numberp (read-from-string string))
+      (parse-integer string)
+    (if (eql (find (read-from-string string) etichetta :test #'equal) NIL)
+        (progn) 
       (position (read-from-string string) etichetta))))
 
+
 (defun riempi-memoria (memoria)
-     (append memoria (make-list (- 100 (length memoria)) :initial-element 0)))
+  (append memoria(make-list (- 100 (length memoria)) :initial-element 0)))
 
-(defun instruction (memoria etichetta)
+
+(defun istruzione (memoria etichetta)
   (cond ((null memoria) nil)
-         ((eq (read-from-string (car  memoria)) 'ADD)
-          (cons (+ 100 (etichetta-scelta (string-trim '(#\Space #\Newline #\Tab)
+    
+    ((equal (read-from-string (car memoria)) 'ADD)
+     (cons (+ 100 (etichetta-scelta (string-trim '(#\Space #\Newline #\Tab)
                         (subseq (car memoria) (search " " (car memoria)))) etichetta))
-           (instruction (cdr memoria) etichetta)))
-
-         ((eq (read-from-string (car memoria)) 'SUB)
-          (cons (+ 200 (etichetta-scelta (string-trim '(#\Space #\Newline #\Tab)
+           (istruzione (cdr memoria) etichetta)))
+    
+    ((equal (read-from-string (car memoria)) 'SUB)
+     (cons (+ 200 (etichetta-scelta (string-trim '(#\Space #\Newline #\Tab)
                         (subseq (car memoria) (search " " (car memoria)))) etichetta))
-           (instruction (cdr memoria) etichetta)))
-
-         ((eq (read-from-string (car memoria)) 'STA)
-          (cons (+ 300 (etichetta-scelta (string-trim '(#\Space #\Newline #\Tab)
+           (istruzione (cdr memoria) etichetta)))
+    
+    ((equal (read-from-string (car memoria)) 'STA)
+     (cons (+ 300 (etichetta-scelta (string-trim '(#\Space #\Newline #\Tab)
                         (subseq (car memoria) (search " " (car memoria)))) etichetta))
-           (instruction (cdr memoria) etichetta)))
-
-
-         ((eq (read-from-string (car memoria)) 'LDA)
-          (cons (+ 500 (etichetta-scelta (string-trim '(#\Space #\Newline #\Tab)
+           (istruzione (cdr memoria) etichetta)))
+    
+    ((equal (read-from-string (car memoria)) 'LDA)
+     (cons (+ 500 (etichetta-scelta (string-trim '(#\Space #\Newline #\Tab)
                         (subseq (car memoria) (search " " (car memoria)))) etichetta))
-           (instruction (cdr memoria) etichetta)))
-
-         ((eq (read-from-string (car memoria)) 'BRA)
-          (cons (+ 600 (etichetta-scelta (string-trim '(#\Space #\Newline #\Tab)
+           (istruzione (cdr memoria) etichetta)))
+   
+    ((equal (read-from-string (car memoria)) 'BRA)
+     (cons (+ 600 (etichetta-scelta (string-trim '(#\Space #\Newline #\Tab)
                         (subseq (car memoria) (search " " (car memoria)))) etichetta))
-           (instruction (cdr memoria) etichetta)))
-
-         ((eq (read-from-string (car memoria)) 'BRZ)
-          (cons (+ 700 (etichetta-scelta (string-trim '(#\Space #\Newline #\Tab)
+           (istruzione (cdr memoria) etichetta)))
+    
+    ((equal (read-from-string (car memoria)) 'BRZ)
+     (cons (+ 700 (etichetta-scelta (string-trim '(#\Space #\Newline #\Tab)
                         (subseq (car memoria) (search " " (car memoria)))) etichetta))
-           (instruction (cdr memoria) etichetta)))
-
-         ((eq (read-from-string (car memoria)) 'BRP)
-          (cons (+ 800 (etichetta-scelta (string-trim '(#\Space #\Newline #\Tab)
+           (istruzione (cdr memoria) etichetta)))
+    
+    ((equal (read-from-string (car memoria)) 'BRP)
+     (cons (+ 800 (etichetta-scelta (string-trim '(#\Space #\Newline #\Tab)
                         (subseq (car memoria) (search " " (car memoria)))) etichetta))
-           (instruction (cdr memoria) etichetta)))
-
-          ((eq (read-from-string (car memoria)) 'INP)
-     (cons 901 (instruction (cdr memoria) etichetta)))
-
-           ((eq (read-from-string (car memoria)) 'OUT)
-     (cons 902 (instruction (cdr memoria) etichetta)))
-
-            ((eq (read-from-string (car memoria)) 'HLT)
-     (cons 000 (instruction (cdr memoria) etichetta)))
-
-            ((eq (read-from-string (car memoria)) 'DAT)
-     (if (eq (string-trim '(#\Space #\Newline #\Tab) (car memoria)) "dat")
-       (cons 000 (instruction (cdr memoria) etichetta))
+           (istruzione (cdr memoria) etichetta)))
+    
+    ((equal (read-from-string (car memoria)) 'INP)
+     (cons 901 (istruzione (cdr memoria) etichetta)))
+    
+    ((equal (read-from-string (car memoria)) 'OUT)
+     (cons 902 (istruzione (cdr memoria) etichetta)))
+    
+    ((equal (read-from-string (car memoria)) 'HLT)
+     (cons 000 (istruzione (cdr memoria) etichetta)))
+    
+    ((equal (read-from-string (car memoria)) 'DAT)
+     (if (equal (string-trim '(#\Space #\Newline #\Tab) (car memoria)) "DAT")
+       (cons 000 (istruzione (cdr memoria) etichetta))
        (cons (parse-integer (string-trim '(#\Space #\Newline #\Tab)
                           (subseq (car memoria) (search " " (car memoria)))))
-             (instruction (cdr memoria) etichetta))))
+             (istruzione (cdr memoria) etichetta))))
 
-            (T (cons (car memoria) (elimina-etichette (cdr memoria) etichetta)))))
+    (T (cons (car memoria) (elimina-etichette (cdr memoria) etichetta)))))
