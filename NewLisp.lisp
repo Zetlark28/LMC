@@ -26,7 +26,7 @@
 
 
 (defun add (state)
-	(cond 	((> (+ (nth 2 state) (nth (mem-instruction state) (nth 6 state))) 1000)
+	(cond 	((>= (+ (nth 2 state) (nth (mem-instruction state) (nth 6 state))) 1000)
 				(list 'STATE 
 	         		:acc (mod (+ (nth 2 state) (nth (mem-instruction state) (nth 6 state))) 1000)
 				:pc (incrementa-pc (nth 4 state))
@@ -41,13 +41,13 @@
                          :mem (nth 6 state)
 	                 :in (nth 8 state)
 	                 :out (nth 10 state)
-	                 :flag 'noflag))))
+	                 :flag (nth 12 state)))))
 
 
 (defun sub (state)
-         (cond ((< (- (nth (mem-instruction state) (nth 6 state)) (nth 2 state)) 0)
+         (cond ((< (- (nth 2 state) (nth (mem-instruction state) (nth 6 state))) 0)
                (list 'STATE 
-               :acc (+ (- (nth (mem-instruction state) (nth 6 state)) (nth 2 state)) 1000)
+               :acc (+ (- (nth 2 state) (nth (mem-instruction state) (nth 6 state))) 1000)
                :pc (incrementa-pc (nth 4 state))
                :mem (nth 6 state)
                :in (nth 8 state)
@@ -55,7 +55,7 @@
                :flag 'flag ))
 
          (T (list 'STATE 
-            :acc (- (nth (mem-instruction state) (nth 6 state)) (nth 2 state))
+            :acc (- (nth 2 state) (nth (mem-instruction state) (nth 6 state)))
             :pc (incrementa-pc (nth 4 state)) 
             :mem (nth 6 state)
             :in (nth 8 state)
@@ -82,7 +82,7 @@
      :flag (nth 12 state)))))
 
 (defun branch-if-zero (state)
- (cond ((= (nth 2 state) 0) (branch state))
+ (cond ((and (= (nth 2 state) 0) (eq (nth 12 state) 'noflag)) (branch state))
   (T(list 'STATE 
   :acc (nth 2 state)
   :pc (incrementa-pc (nth 4 state))
@@ -174,6 +174,10 @@
     (unless (eq e 'eof)
       (append (list e) (crea-lista input-stream)))))
 
+(defun nuova-lista (vecchialista)
+  (let ((nuovalista (mapcar 'upper vecchialista)))
+    (elimina-riga-vuota nuovalista)))
+
 (defun upper (line)
   (string-upcase
    (string-trim '(#\Space #\Newline #\Tab)
@@ -187,10 +191,6 @@
         ((equal (car lista) "")
          (elimina-riga-vuota (cdr lista)))
         (T (cons (car lista) (elimina-riga-vuota (cdr lista))))))
-
-(defun nuova-lista (vecchialista)
-  (let ((nuovalista (mapcar 'upper vecchialista)))
-    (elimina-riga-vuota nuovalista)))
 
 (defun etichette (lista)
   (cond ((null lista) nil)
