@@ -1,4 +1,5 @@
 %%Ezpeleta Clark 837002, Sad Rafik 816920, nome e matricola di ogni membro
+%%Per funzione dei metodi guardare il file readme
 
 state(Acc, Pc, Mem, In, Out, Flag):-between(0, 999, Acc),
                                     between(0, 99, Pc),
